@@ -11,7 +11,7 @@ declare module "obsidian" {
   interface App {
     plugins: {
       plugins: {
-        "obsidian-reminder-plugin": ReminderPlugin;
+        "akita-reminder": ReminderPlugin;
         /**
          * Read for its date/time format settings so reminders written in
          * Kanban's format round-trip; see `model/format/reminder-kanban-plugin`.

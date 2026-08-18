@@ -11,7 +11,7 @@
       markdown,
       span,
       sourcePath,
-      window.app.plugins.plugins["obsidian-reminder-plugin"],
+      window.app.plugins.plugins["akita-reminder"],
     );
     span.childNodes.forEach((n) => {
       if (n instanceof HTMLElement) {

@@ -19,8 +19,18 @@ export class TasksPluginReminderModel implements TasksLikeReminderModel {
   private static readonly symbolDoneDate = Symbol.ofChar("✅");
   private static readonly symbolRecurrence = Symbol.ofChar("🔁");
   private static readonly symbolReminder = Symbol.ofChar("⏰");
-  private static readonly symbolScheduled = Symbol.ofChar("⏳");
+  // The Tasks plugin's own scheduled-date regex is `(?:⏳|⌛)`.
+  private static readonly symbolScheduled = Symbol.ofChars([..."⏳⌛"]);
   private static readonly symbolStart = Symbol.ofChar("🛫");
+  // Tasks plugin fields this plugin recognises but does not consume: they are
+  // tokenised so they stay out of the title and out of other tokens' text,
+  // and `toMarkdown()` writes them back untouched.
+  private static readonly symbolCreated = Symbol.ofChar("➕");
+  private static readonly symbolCancelledDate = Symbol.ofChar("❌");
+  private static readonly symbolOnCompletion = Symbol.ofChar("🏁");
+  private static readonly symbolId = Symbol.ofChar("🆔");
+  private static readonly symbolDependsOn = Symbol.ofChar("⛔");
+  private static readonly symbolPriority = Symbol.ofChars([..."⏬🔽🔼⏫🔺"]);
   private static readonly allSymbols = [
     TasksPluginReminderModel.symbolDueDate,
     TasksPluginReminderModel.symbolDoneDate,
@@ -28,6 +38,12 @@ export class TasksPluginReminderModel implements TasksLikeReminderModel {
     TasksPluginReminderModel.symbolReminder,
     TasksPluginReminderModel.symbolStart,
     TasksPluginReminderModel.symbolScheduled,
+    TasksPluginReminderModel.symbolCreated,
+    TasksPluginReminderModel.symbolCancelledDate,
+    TasksPluginReminderModel.symbolOnCompletion,
+    TasksPluginReminderModel.symbolId,
+    TasksPluginReminderModel.symbolDependsOn,
+    TasksPluginReminderModel.symbolPriority,
   ];
 
   public static parse(
@@ -222,12 +238,11 @@ export class TasksPluginReminderModel implements TasksLikeReminderModel {
   /**
    * The date is the HEAD of the token's text, and only the head.
    *
-   * A token runs to the next symbol *this plugin* knows, so it routinely
-   * carries what it does not tokenise — the Tasks plugin's own ➕/🆔/⛔, a tag,
-   * prose. moment's lenient mode searches such a string and borrows a date from
-   * anywhere in it, which is how "⏳ no date here ➕ 2026-08-17" acquires a
-   * scheduled date it does not have, and how "⏰ no date here ➕ 2026-08-17"
-   * fabricates a midnight.
+   * A token runs to the next symbol *this plugin* knows, so it still carries
+   * what it does not tokenise — a tag, prose. moment's lenient mode searches
+   * such a string and borrows a date from anywhere in it, which is how
+   * "⏳ no date here #due-2026" could acquire a scheduled date it does not
+   * have, or fabricate a midnight for "⏰".
    *
    * The Tasks plugin anchors the other way — its regexes end in `$` and allow
    * only spaces between marker and date — so requiring the date at the head of

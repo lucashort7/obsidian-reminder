@@ -673,6 +673,9 @@ describe("⏰ honours the Strict date format setting (📅/⏳/🛫 stay strict)
       "2021-09-08",
     );
     expect(spans[0]!.reminder.time.hasTimePart).toBe(false);
+  });
+});
+
 describe("task statuses follow the registry (scenarios 2 and 3)", (): void => {
   // The fixture vault's registry, trimmed: the two core statuses plus the
   // custom ones the scenarios exercise.
@@ -775,5 +778,41 @@ describe("done date on un-check", (): void => {
     expect(
       await modifyUnchecked("- [/] Task 📅 2021-09-08 ✅ 2021-09-09"),
     ).toBe("- [/] Task 📅 2021-09-16 ✅ 2021-09-09");
+  });
+});
+
+describe("Tasks plugin fields are tokenised, not title text", (): void => {
+  const opts = { customEmoji: true, dueDateFallback: true };
+
+  test("➕ created date stays out of the title", (): void => {
+    const spans = parseLine("- [ ] task1➕ 2026-08-17 ⏳ 2026-08-20", opts);
+    expect(spans).toHaveLength(1);
+    expect(spans[0]!.reminder.title).toBe("task1");
+  });
+
+  test("🆔/⛔/priority stay out of the title", (): void => {
+    const spans = parseLine(
+      "- [ ] do this first ⏫ 🆔 dcf64c ⛔ x1,x2 ⏳ 2026-08-20",
+      opts,
+    );
+    expect(spans).toHaveLength(1);
+    expect(spans[0]!.reminder.title).toBe("do this first");
+  });
+
+  test("⌛ is scheduled too, like the Tasks plugin's (?:⏳|⌛)", (): void => {
+    const spans = parseLine("- [ ] hourglass done ⌛ 2026-08-20", opts);
+    expect(spans).toHaveLength(1);
+    expect(spans[0]!.reminder.time.toString()).toBe("2026-08-20");
+  });
+
+  test("unconsumed fields survive a modify untouched", async () => {
+    await testModify({
+      now: "2026-08-18",
+      customEmoji: true,
+      dueDateFallback: true,
+      inputMarkdown: "- [ ] task ➕ 2026-08-16 🆔 abc123 ⏳ 2026-08-17",
+      expectedMarkdown:
+        "- [x] task ➕ 2026-08-16 🆔 abc123 ⏳ 2026-08-17 ✅ 2026-08-18",
+    });
   });
 });

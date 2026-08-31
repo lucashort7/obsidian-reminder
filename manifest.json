@@ -1,7 +1,7 @@
 {
 	"id": "akita-reminder",
 	"name": "Akita Reminder",
-	"version": "1.4.3-akita.1",
+	"version": "1.4.3-akita.2",
 	"minAppVersion": "1.7.2",
 	"description": "Fork of uphy/obsidian-reminder used as a workbench. Not for distribution.",
 	"author": "uphy",

@@ -132,7 +132,6 @@ export class ReminderListItemViewProxy {
         this.valid = true;
       } else {
         this.valid = false;
-        console.debug("view is null.  Skipping reminder list view reload");
       }
     }
   }

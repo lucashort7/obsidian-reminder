@@ -45,7 +45,6 @@ export class ReminderPluginFileSystem {
   }
 
   async reloadRemindersInFile(file: TAbstractFile) {
-    console.debug("Reload file and collect reminders: file=%s", file.path);
     if (!(file instanceof TFile)) {
       console.debug("Cannot read file other than TFile: file=%o", file);
       return false;

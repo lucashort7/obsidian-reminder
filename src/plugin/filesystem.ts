@@ -40,21 +40,17 @@ export class ReminderPluginFileSystem {
   }
 
   async removeRemindersByFile(path: string): Promise<boolean> {
-    console.debug("Remove file: path=%s", path);
     return this.reminders.removeByFile(path);
   }
 
   async reloadRemindersInFile(file: TAbstractFile) {
     if (!(file instanceof TFile)) {
-      console.debug("Cannot read file other than TFile: file=%o", file);
       return false;
     }
     if (!this.isMarkdownFile(file)) {
-      console.debug("Not a markdown file: file=%o", file);
       return false;
     }
     if (isPathExcluded(file.path, this.excludedPaths())) {
-      console.debug("Excluded file: file=%o", file);
       // The file may have had reminders from before it was excluded; make
       // sure those are removed so the exclusion actually hides them.
       return this.reminders.removeByFile(file.path);
